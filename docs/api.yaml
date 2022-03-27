@@ -1,0 +1,412 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: API overview
+servers:
+  - url: http://localhost:8000/api
+paths:
+  /auth/access:
+    post:
+      summary: Pega o token de acesso com usuário e senha
+      operationId: accessToken
+      tags:
+        - auth
+      parameters:
+        - in: body
+          required: true
+          schema:
+            type: object
+            required:
+              - email
+              - password
+            properties:
+              email:
+                type: string
+              password:
+                type: string
+      responses:
+        '200':
+          description: Resposta esperada para login bem sucedido
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access:
+                    type: string
+                  refresh:
+                    type: string
+  /auth/refresh: 
+    post:
+      summary: Pega o token de acesso com o token de refresh
+      operationId: refreshToken
+      tags:
+        - auth
+      parameters:
+        - in: body
+          required: true
+          schema:
+            type: object
+            required:
+              - refresh
+            properties:
+              refresh:
+                type: string
+      responses:
+        '200':
+          description: Resposta esperada para login bem sucedido
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access:
+                    type: string
+  /user/create:
+    post:
+      summary: Endpoint para criação de nova conta no nosso sistema
+      operationId: createAccount
+      tags:
+        - user
+      parameters:
+        - in: body
+          required: true
+          schema:
+            type: object
+            required:
+              - email
+              - password
+              - name
+              - cpf
+            properties:
+              email:
+                type: string
+              password:
+                type: string
+              name:
+                type: string
+              cpf:
+                type: string
+              tel:
+                type: string
+      responses:
+        '200':
+          description: Resposta esperada para criação de conta bem sucedida
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status_code: 
+                    type: integer
+                  message:
+                    type: string
+  /user/get:
+    get:
+      summary: Endpoint para obter informações de usuário
+      operationId: getUser
+      tags:
+        - user
+      parameters:
+          - in: header
+            required: true
+            name: Authorization
+            schema:
+              type: string
+              default: Bearer {{access_token}}
+      responses:
+        '200':
+          description: Resposta esperada
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/user'
+  /user/put: 
+    put:
+      summary: "Altera os dados de usuário já cadastrado"
+      operationId: updateUser
+      tags:
+        - user
+      parameters:
+          - in: header
+            required: true
+            name: Authorization
+            schema:
+              type: string
+              default: Bearer {{access_token}}
+          - in: body
+            required: true
+            schema:
+              type: object
+              required:
+                - password
+              properties:
+                password:
+                  type: string
+                new_name:
+                  type: string
+                new_email:
+                  type: string
+                new_tel:
+                  type: string
+      responses:
+        '200':
+          description: Resposta esperada para login bem sucedido
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access:
+                    type: string
+  /user/changepassword: 
+    put:
+      summary: "Altera a senha do usuário já cadastrado e logado."
+      operationId: updatePassword
+      tags:
+        - user
+      parameters:
+          - in: header
+            required: true
+            name: Authorization
+            schema:
+              type: string
+              default: Bearer {{access_token}}
+          - in: body
+            required: true
+            schema:
+              type: object
+              required:
+                - old_password
+                - new_password
+              properties:
+                old_password:
+                  type: string
+                new_password:
+                  type: string
+      responses:
+        '200':
+          description: Resposta esperada para login bem sucedido
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access:
+                    type: string
+  /password_reset:
+    post:
+      summary: Envia e-mail para usuário redefinir a senha
+      operationId: resetPassword
+      parameters:
+        - in: body
+          required: true
+          schema:
+            type: object
+            required:
+              - email
+            properties:
+              email:
+                type: string
+      responses:
+        '200':
+          description: Resposta esperada para criação de conta bem sucedida
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+  /password_reset/confirm:
+    post:
+      summary: Recebe token e senha nova para redefiní-la
+      operationId: resetPassword
+      parameters:
+        - in: body
+          required: true
+          schema:
+            type: object
+            required:
+              - token
+              - password
+            properties:
+              token:
+                type: string
+              password:
+                type: string
+      responses:
+        '200':
+          description: Resposta esperada para criação de conta bem sucedida
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+  /user/data/transactions:
+    get:
+      summary: Endpoint para listar transações relacionadas ao usuário
+      operationId: listTransactions
+      tags:
+        - user
+      parameters:
+          - in: header
+            required: true
+            name: Authorization
+            schema:
+              type: string
+              default: Bearer {{access_token}}
+          - in: path
+            name: credit_type
+            schema:
+              type: integer
+              enum: [DEBITO, CREDITO]
+            required: false
+            description: Indica se a listagem deverá ser apenas de transações de débito ou crédito. Se o parâmetro não for enviado, ambos os tipos de transação serão listados
+      responses:
+        '200':
+          description: Resposta esperada
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/transaction'
+  /user/data/transactions?by=account:
+    get:
+      summary: Endpoint para listar transações relacionadas ao usuário. Faz o mesmo do exemplo acima, mas utiliza o parâmetro by=account e o formato da resposta é diferente
+      operationId: listTransactions
+      tags:
+        - user
+      parameters:
+          - in: header
+            required: true
+            name: Authorization
+            schema:
+              type: string
+              default: Bearer {{access_token}}
+          - in: path
+            name: by
+            schema:
+              type: integer
+              enum: [account]
+            required: true
+            description: Indica se a listagem deverá ser feita de acordo com as contas do usuário
+          - in: path
+            name: credit_type
+            schema:
+              type: integer
+              enum: [DEBITO, CREDITO]
+            required: false
+            description: Indica se a listagem deverá ser apenas de transações de débito ou crédito. Se o parâmetro não for enviado, ambos os tipos de transação serão listados
+      responses:
+        '200':
+          description: Resposta esperada
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/account'
+                    - type: array
+                      items:
+                        oneOf: 
+                          - $ref: '#/components/schemas/transaction'
+  /user/data/balance:
+    get:
+      summary: Endpoint para listar os balançoes mensais dom usuário
+      operationId: listBalance
+      tags:
+        - user
+      parameters:
+          - in: header
+            required: true
+            name: Authorization
+            schema:
+              type: string
+              default: Bearer {{access_token}}
+      responses:
+        '200':
+          description: Resposta esperada
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/balance'
+components:
+  schemas:
+    user:
+      type: object
+      properties:
+        email:
+          type: string
+        name:
+          type: string
+        cpf:
+          type: string
+        tel:
+          type: string
+        status:
+          type: string
+        code:
+          type: number
+    transaction:
+      type: object
+      properties:
+        completedAuthorisedPaymentType:
+          type: string
+        creditDebitType:
+          type: string
+        transactionName:
+          type: string
+        type:
+          type: string
+        amount:
+          type: string
+        transactionCurrency:
+          type: string
+        transactionDate:
+          type: string
+        partieCnpjCpf:
+          type: string
+        partiePersonType:
+          type: string
+        partieBranchCode:
+          type: string
+        partieNumber:
+          type: string
+        partieCheckDigit:
+          type: string
+    account:
+      type: object
+      properties:
+        brandName:
+          type: string
+        companyCnpj:
+          type: string
+        accountType:
+          type: string
+        number:
+          type: string
+        checkDigit:
+          type: string
+        accountid:
+          type: string
+    balance:
+      type: object
+      properties:
+        year:
+          type: string
+        month:
+          type: string
+        balance:
+          type: number

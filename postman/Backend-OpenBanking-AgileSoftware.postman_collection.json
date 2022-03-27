@@ -1,0 +1,448 @@
+{
+	"info": {
+		"_postman_id": "b71aa156-aa46-41e5-ab68-1209dd66f22e",
+		"name": "Backend-OpenBanking-AgileSoftware",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "login / get tokens",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"if request is OK, set access token\", function(){\r",
+									"    var jsonData = pm.response.json()\r",
+									"    if (jsonData != undefined){\r",
+									"        pm.environment.set('access_token', jsonData.access)\r",
+									"        pm.environment.set('refresh_token', jsonData.refresh)\r",
+									"    }\r",
+									"    pm.response.to.have.status(200)\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"ricardo@email.com\",\r\n    \"password\": \"senha\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/access",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"access"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "refresh token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"if request is OK, set access token\", function(){\r",
+									"    var jsonData = pm.response.json()\r",
+									"    if (jsonData != undefined){\r",
+									"        pm.environment.set('access_token', jsonData.access)\r",
+									"    }\r",
+									"    pm.response.to.have.status(200)\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"refresh\": \"{{refresh_token}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/refresh",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "data",
+					"item": [
+						{
+							"name": "get transactions",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/user/data/transactions?by=account&credit_type=CREDITO",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"user",
+										"data",
+										"transactions"
+									],
+									"query": [
+										{
+											"key": "by",
+											"value": "account"
+										},
+										{
+											"key": "credit_type",
+											"value": "CREDITO"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get user balance",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/user/data/balance",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"user",
+										"data",
+										"balance"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "create account",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Jorge\",\r\n    \"email\": \"a@d.com\",\r\n    \"password\": \"senha\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/user/create",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"user",
+								"create"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "consent",
+			"item": [
+				{
+					"name": "data",
+					"item": [
+						{
+							"name": "get user consent",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/user/data/consent",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"user",
+										"data",
+										"consent"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create consent",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"user\": {\r\n        \"email\": \"pedro@email.com\"\r\n    },\r\n    \"account\": {\r\n        \"brandName\": \"safra\"\r\n    }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/user/data/consent",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"user",
+										"data",
+										"consent"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "edit consent permission",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"user\": {\r\n        \"email\": \"ricardo@email.com\",\r\n        \"CPF\":123456789\r\n    },\r\n    \"consent\": {\r\n        \"consentId\": \"urn:santander:83afcd91-5ff1-4948-bf16-09997fbf560b\"\r\n    },\r\n    \"opType\": \"EDIT_PERMISSION\",\r\n    \"newPermissions\":\"LEITURA_DE_RECURSOS,LEITURA_DE_CONTA\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/user/data/consent",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"user",
+										"data",
+										"consent"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "renovate consent",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"user\": {\r\n        \"email\": \"ricardo@email.com\",\r\n        \"CPF\":123456789\r\n    },\r\n    \"consent\": {\r\n        \"consentId\": \"urn:santander:83afcd91-5ff1-4948-bf16-09997fbf560b\"\r\n    },\r\n    \"opType\": \"RENOVAR\",\r\n    \"extraMonths\":1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/user/data/consent",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"user",
+										"data",
+										"consent"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "revoke consent",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"user\": {\r\n        \"email\": \"ricardo@email.com\",\r\n        \"CPF\":123456789\r\n    },\r\n    \"consent\": {\r\n        \"consentId\": \"urn:itau:5da9cad0-5d50-44bb-ad1a-9ca732ad9ba5\"\r\n    },\r\n    \"opType\": \"REVOGAR\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/user/data/consent",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"user",
+										"data",
+										"consent"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "exemple",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/exemple",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"exemple"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "https://data.directory.openbankingbrasil.org.br/participants",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": ""
+				}
+			},
+			"response": []
+		}
+	]
+}
